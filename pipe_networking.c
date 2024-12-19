@@ -21,7 +21,9 @@ int server_setup() {
     perror("Error opening MARIO WKP pipe");
     exit(1);
 } */
-  // oh this probably requires all the other functions firrst :(
+  // oh this probably requires all the other functions first :(
+
+  // additionally, make sure that I have a signal catcher for sigInt so that it deletes the pipe laterrrrrrr
   return from_client;
 }
 
@@ -35,6 +37,7 @@ int server_setup() {
   returns the file descriptor for the upstream pipe (see server setup).
   =========================*/
 int server_handshake(int *to_client) {
+  // calls server_setup() and I think something calls something else?  
   int from_client;
   return from_client;
 }
