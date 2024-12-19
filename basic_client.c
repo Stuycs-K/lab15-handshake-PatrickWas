@@ -1,7 +1,6 @@
 #include "pipe_networking.h"
 
 int main() {
-
   int to_server;
   int from_server;
 

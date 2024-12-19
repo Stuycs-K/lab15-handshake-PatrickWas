@@ -10,12 +10,23 @@
   returns the file descriptor for the upstream pipe.
   =========================*/
 int server_setup() {
-  int from_client = 0;
+  int from_client;
+  if(mkfifo(WKP, 0666) == -1){
+    perror("Error creating the MARIO WKP");
+    exit(1);
+  }
+
+  //from_client = open(WKP, O_WRONLY)
+  /* if(from_client == -1){
+    perror("Error opening MARIO WKP pipe");
+    exit(1);
+} */
+  // oh this probably requires all the other functions firrst :(
   return from_client;
 }
 
 /*=========================
-  server_handshake 
+  server_handshake
   args: int * to_client
 
   Performs the server side pipe 3 way handshake.
@@ -56,5 +67,3 @@ int server_connect(int from_client) {
   int to_client  = 0;
   return to_client;
 }
-
-
