@@ -40,10 +40,18 @@ int server_handshake(int *to_client) {
   int from_client = server_setup();
 
   char buffer[256];
+  
   if(read(from_client, buffer, sizeof(buffer)) == -1){
     perror("Error reading from client");
     exit(1);
   }
+
+  printf("Server received SYN: Client's pipe: %s\n", buffer);
+  unlink(WKP);
+
+  srand(time(NULL));
+  int random = rand();
+  printf("Server rand: %d\n", random);
 
   *to_client = open(buffer, O_WRONLY);
   if(*to_client == -1){
@@ -51,7 +59,7 @@ int server_handshake(int *to_client) {
     exit(1);
   }
 
-  if(write(*to_client, *SYN_ACK, 4) == -1){
+  if(write(*to_client, &random, sizeof(random)) == -1){
     perror("Error sending SYN_ACK to client");
     exit(1);
   }
@@ -96,12 +104,19 @@ int client_handshake(int *to_server) {
     exit(1);
   }
 
-  if(read(from_server, buffer, sizeof(buffer)) == -1){
-    perror("Error reading from server");
+  int randServer;
+  if(read(from_server, &randServer, sizeof(randServer)) == -1){
+    perror("Error reading SYN_ACK from server");
     exit(1);
   }
 
-  printf("Client got handshake: %s\n", buffer);
+  printf("SYN_ACK: %d\n", randServer);
+
+  int ack = randServer+1;
+  if(write(*to_server, &ack, sizeof(ack)) == -1){
+    perror("Error sending ACK");
+    exit(1);
+  }
 
   return from_server;
 }
