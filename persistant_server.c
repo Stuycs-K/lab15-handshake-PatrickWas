@@ -15,9 +15,24 @@ int main() {
     int from_client;
 
     from_client = server_handshake( &to_client );
+    unlink(WKP);
+    
+    pid_t pid = fork();
+    if(pid == -1){
+      printf("my fork has only 3 prongs");
+      exit(1);
+    }
 
-    close(from_client);
-    close(to_client);
+    if(pid == 0){
+      close(from_client);
+      close(to_client);
+      exit(0);
+    } else{
+      close(to_client);
+      close(from_client);
+      waitpid(pid, NULL, 0);
+    }
+
   }
 
   return 0;
