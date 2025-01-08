@@ -50,19 +50,30 @@ int server_handshake(int *to_client) {
   unlink(WKP);
 
   srand(time(NULL));
-  int random = rand();
-  printf("Server rand: %d\n", random);
+  int random = rand() % 100;
+  printf("Server SYN_ACK: %d\n", random);
 
   *to_client = open(buffer, O_WRONLY);
   if(*to_client == -1){
-    perror("Error opening pipe");
+    perror("Error opening pipe\n");
     exit(1);
   }
 
   if(write(*to_client, &random, sizeof(random)) == -1){
-    perror("Error sending SYN_ACK to client");
+    perror("Error sending SYN_ACK to client\n");
     exit(1);
   }
+
+  int ack;
+
+  if(read(from_client, &ack, sizeof(ack)) == -1){
+    perror("Error receiving ACK");
+    exit(1);
+  }
+
+  printf("Received ack: %d\n", ack);
+
+
   return from_client;
 }
 
@@ -81,6 +92,8 @@ int client_handshake(int *to_server) {
   char buffer[256]; 
 
   snprintf(buffer, sizeof(buffer), "/tmp/%d", getpid());
+
+  printf("pid: %d\n", getpid());
 
   if(mkfifo(buffer, 0666) == -1){
     perror("Error creating client's PP");
@@ -118,6 +131,13 @@ int client_handshake(int *to_server) {
     exit(1);
   }
 
+  /*if(read(from_server, &ack, sizeof(ack)) == -1){
+    perror("Error receiving ACK");
+    exit(1);
+  }*/
+
+  printf("Client ACK: %d\n", ack);
+
   return from_server;
 }
 
@@ -134,10 +154,10 @@ int server_connect(int from_client) {
   int to_client;
   char buffer[256];
 
-  if(read(from_client, buffer, sizeof(buffer)) == -1){
+  /*if(read(from_client, buffer, sizeof(buffer)) == -1){
     perror("Error reading client PP");
     exit(1);
-  }
+  }*/
 
   printf("Server got client PP: %s\n", buffer);
 
